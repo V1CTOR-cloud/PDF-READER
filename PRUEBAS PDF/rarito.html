@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv=/cContent-Type/c content=/ctext/html; charset=UTF-8/c />
+    <meta name=/cviewport/c content=/cwidth=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no/c>
+    <link rel=/cstylesheet/c href=/cprueba.css/c>
+    <script src=/c//mozilla.github.io/pdf.js/build/pdf.js/c crossorigin=/canonymous/c></script>
+
+    <style type=/ctext/css/c>
+        #the-canvas {
+            border: 0.5px solid black;
+            direction: ltr;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1 class=/ctitulo/c>
+            <span>Velneo</span> PDF viewer
+        </h1>
+        <div class=/ccont-btn/c>
+            <button id=/cprev/c>Previous</button>
+            <button id=/cnext/c>Next</button> &nbsp; &nbsp;
+            <button id=/czoomIn/c>+</button>
+            <button id=/czoomOut/c>-</button>
+            <span>Page: <span id=/cpage_num/c></span> / <span id=/cpage_count/c></span></span>
+        </div>
+    </header>
+    <div class=/ccontainer/c>
+        <div class=/ccont1/c>
+            <canvas id=/cthe-canvas/c></canvas>
+        </div>
+        <div class=/ccont2/c>
+            <div class=/ctextLayer/c></div>
+        </div>
+    </div>
+
+    <script>
+        // If absolute URL from the remote server is provided, configure the CORS
+        // header on that server.
+        var url = /cKIJOTE.pdf/c;
+
+        // Loaded via <script> tag, create shortcut to access PDF.js exports.
+        var pdfjsLib = window[/cpdfjs-dist/build / pdf / c];
+
+        // The workerSrc property shall be specified.
+        pdfjsLib.GlobalWorkerOptions.workerSrc = /c/ / mozilla.github.io / pdf.js / build / pdf.worker.js / c;
+
+        var pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            //scale = 0.8,
+            scale = 1,
+            canvas = document.getElementById(/cthe-canvas/c),
+            ctx = canvas.getContext(/c2d/c);
+
+        /**
+         * Get page info from document, resize canvas accordingly, and render page.
+         * @param num Page number.
+         */
+        function renderPage(num) {
+            pageRendering = true;
+            // Using promise to fetch the page
+            pdfDoc.getPage(num).then(function(page) {
+                var viewport = page.getViewport({
+                    scale: scale
+                });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+
+                // Render PDF page into canvas context
+                var renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                var renderTask = page.render(renderContext);
+
+                // Wait for rendering to finish
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        // New page rendering is pending
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                }).then(function() {
+                    // Returns a promise, on resolving it will return text contents of the page
+                    return page.getTextContent();
+                }).then(function(textContent) {
+
+                    // Assign CSS to the textLayer element
+                    var textLayer = document.querySelector(/c.textLayer/c);
+
+
+
+                    // Pass the data to the method for rendering of text over the pdf canvas.
+                    pdfjsLib.renderTextLayer({
+                        textContent: textContent,
+                        container: textLayer,
+                        viewport: viewport,
+                        textDivs: []
+                    });
+                });
+            });
+
+            // Update page counters
+            document.getElementById(/cpage_num/c).textContent = num;
+        }
+
+        /**
+         * If another page rendering in progress, waits until the rendering is
+         * finised. Otherwise, executes rendering immediately.
+         */
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+
+        /**
+         * Displays previous page.
+         */
+        function onPrevPage() {
+            if (pageNum <= 1) {
+                return;
+            }
+            pageNum--;
+            queueRenderPage(pageNum);
+        }
+        document.getElementById(/cprev/c).addEventListener(/cclick/c, onPrevPage);
+
+        /**
+         * Displays next page.
+         */
+        function onNextPage() {
+            if (pageNum >= pdfDoc.numPages) {
+                return;
+            }
+            pageNum++;
+            queueRenderPage(pageNum);
+        }
+        document.getElementById(/cnext/c).addEventListener(/cclick/c, onNextPage);
+
+        function zoomOut() {
+            scale -= 0.1;
+            renderPage(pageNum)
+        }
+        document.getElementById(/czoomOut/c).addEventListener(/cclick/c, zoomOut)
+
+        function zoomIn() {
+            scale += 0.1;
+            renderPage(pageNum)
+        }
+        document.getElementById(/czoomIn/c).addEventListener(/cclick/c, zoomIn)
+
+        /**
+         * Asynchronously downloads PDF.
+         */
+        pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+            pdfDoc = pdfDoc_;
+            document.getElementById(/cpage_count/c).textContent = pdfDoc.numPages;
+
+            // Initial/first page rendering
+            renderPage(pageNum);
+        });
+    </script>
+
+</body>
+
+</html>

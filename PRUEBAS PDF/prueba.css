@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Open Sans";
+}
+
+:root {
+    --themeColor: #e40c0c;
+    --fondo: #f4f6fc;
+}
+
+body {
+    background: var(--fondo);
+}
+
+.container {
+    height: 100%;
+    width: 100%;
+    background: var(--fondo);
+    display: flex;
+}
+
+header {
+    height: 20vh;
+    width: 100%;
+    background: var(--fondo);
+}
+
+.titulo {
+    font-size: 3rem;
+    padding: 20px;
+}
+
+.titulo span {
+    color: var(--themeColor);
+}
+
+.cont1 {
+    height: 100%;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#the-canvas {
+    height: 60%;
+    width: 50%;
+}
+
+.cont2 {
+    height: 100%;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cont-btn {
+    position: absolute;
+    left: 12.5%;
+}
+
+button {
+    padding: 10px 15px 10px 15px;
+    border-radius: 15px;
+    border: none;
+}
+
+button:hover {
+    background-color: #e40c0c;
+    color: white;
+}
+
+#zoomIn,
+#zoomOut {
+    padding: 0;
+    height: 1.5rem;
+    width: 2rem;
+}

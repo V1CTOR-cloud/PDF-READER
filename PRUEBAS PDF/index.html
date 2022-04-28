@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="prev">Previous</button>
+    <button id="next">Nex</button>
+    <button id="zoomIn">++</button>
+    <button id="zoomOut">--</button>
+    <span>
+        Page: <span id="page_num"></span> / <span id="page_count"></span>
+    </span>
+    <canvas id="pdf_canvas"></canvas>
+
+
+    <div id="viewer" style="height: 100%; width: 100%;">
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.13.216/build/pdf.min.js"></script>
+    <script src="https://raw.githubusercontent.com/mozilla/pdf.js/master/web/ui_utils.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>
